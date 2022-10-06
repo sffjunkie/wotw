@@ -1,5 +1,5 @@
 from typing import Path
-from wotw.readdirectorychanges import ReadDirectoryChanges
+from wotw.win32.readdirectorychanges import ReadDirectoryChanges
 
 
 def test():
