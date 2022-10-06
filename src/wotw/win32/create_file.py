@@ -2,7 +2,7 @@ from pathlib import Path
 import ctypes
 from ctypes import windll, wintypes
 from enum import IntFlag, IntEnum
-from typing import Any
+from typing import Any, Optional
 
 # https://learn.microsoft.com/en-us/windows/win32/secauthz/access-mask
 
@@ -86,7 +86,7 @@ class FileAttributes(IntFlag):
 
 class SecurityAttributes(ctypes.Structure):
     _fields_ = [
-        ("nLength", ctypes.wintypes.DWORD),
+        ("nLength", wintypes.DWORD),
         ("lpSecurityDescriptor", ctypes.c_void_p),
         ("bInheritHandle", ctypes.c_bool),
     ]
@@ -99,7 +99,7 @@ def create_file(
     security_attrs: Any = NULL,
     creation_disposition: FileCreationDisposition = FileCreationDisposition.OPEN_EXISTING,
     flags: FileAttributes = FileAttributes.FILE_FLAG_BACKUP_SEMANTICS,
-    template: wintypes.HANDLE = NULL,
+    template: Optional[wintypes.HANDLE] = None,
 ):
     CreateFileW = windll.kernel32.CreateFileW
     CreateFileW.argtypes = (
@@ -116,7 +116,6 @@ def create_file(
     lpSecurityAttributes = ctypes.byref(security_attrs) if security_attrs else NULL
     hTemplateFile = template if template else NULL
 
-    path = str(path)
     return CreateFileW(
         str(path),
         access,

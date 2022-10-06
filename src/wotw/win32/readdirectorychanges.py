@@ -1,7 +1,6 @@
 import ctypes
 import ctypes.wintypes
 from enum import IntFlag
-from fileinput import filename
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +9,6 @@ from wotw.win32.create_file import (
     FileCreationDisposition,
     FileDirAccessRights,
     FileShareMode,
-    GenericAccessRights,
     create_file,
 )
 from wotw.win32.notify_info import NotifyInfo
@@ -60,12 +58,14 @@ def error_check(
 
 
 def completion_routine(
-    error_code: int, number_of_bytes_transfered: int, overlapped: ctypes.pointer
+    error_code: int,
+    number_of_bytes_transfered: int,
+    overlapped: ctypes._FuncPointer,
 ) -> None:
     ...
 
 
-ReadDirectoryChangesW = ctypes.windll.kernel32.ReadDirectoryChangesW
+ReadDirectoryChangesW: ctypes._FuncPointer = ctypes.windll.kernel32.ReadDirectoryChangesW
 
 ReadDirectoryChangesW.restype = ctypes.wintypes.BOOL
 ReadDirectoryChangesW.errcheck = error_check
@@ -77,7 +77,7 @@ ReadDirectoryChangesW.argtypes = (
     ctypes.wintypes.DWORD,  # dwNotifyFilter
     ctypes.POINTER(ctypes.wintypes.DWORD),  # lpBytesReturned
     ctypes.POINTER(Overlapped),  # lpOverlapped
-    ctypes.POINTER,  # FileIOCompletionRoutine # lpCompletionRoutine
+    ctypes.POINTER, # type: ignore # FileIOCompletionRoutine # lpCompletionRoutine
 )
 
 
